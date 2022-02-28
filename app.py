@@ -1,13 +1,14 @@
 from matplotlib.pyplot import show
 import streamlit as st
-
+import datetime
+import yfinance as yf
 
 from fbprophet import Prophet
 from fbprophet.plot import plot_plotly
 from plotly import graph_objs as go
 
 
-from plots import plot_history
+from plots import plot_history, plot_candles, plot_forecast
 
 
 symbols = [
@@ -47,6 +48,9 @@ def get_stock_data(symbol,
   print('symbol: {}, start: {}, end: {}, delta: {}'.format(symbol, start, end, t_delta))
   df = yf.download(symbol, start=start, 
                     end=end)
+
+  df['Date'] = df.index
+  df.reset_index(drop=True, inplace = True)
   return df
 
 
@@ -56,9 +60,6 @@ def prophet_forecast(
                      ):
   
   period = n_years * 365
-
-  data['Date'] = data.index
-  data.reset_index(drop=True, inplace = True)
 
   df_train = data[['Date', 'Close']]
   df_train = df_train.rename(
@@ -91,8 +92,8 @@ st.write(df.head())
 
 # candlestick
 st.write('Candlestick for {}'.format(selected_stock))
-fig = plot_candles(df, selected_stock)
-t.plotly_chart(fig)
+fig1 = plot_candles(df, selected_stock)
+st.plotly_chart(fig1)
 
 # apply model
 y, m = prophet_forecast(data=df,
@@ -100,7 +101,8 @@ y, m = prophet_forecast(data=df,
 
 # Forecast
 st.write('Forecast for {}'.format(selected_stock))
-fig = plot_forecast(y,
+fig2 = plot_forecast(y,
                     period = 365*n_years)
+st.pyplot(fig2)
 st.write(y)
 
