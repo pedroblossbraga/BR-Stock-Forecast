@@ -4,6 +4,7 @@ Web app for prediction of some Brazilian stocks.
 ## Models:
 
 - Prophet 
+- LSTM: comming soon
 
 ## Available symbols
 
