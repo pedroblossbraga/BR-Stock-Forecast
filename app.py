@@ -70,9 +70,9 @@ def prophet_forecast(
   m.fit(df_train)
   future = m.make_future_dataframe(periods = period)
 
-  y_hat = m.predict(future)
+  y = m.predict(future)
   
-  return y_hat, m
+  return y, m
 
 
 st.title('Brazilian Stock Forecast')
@@ -86,8 +86,21 @@ n_years = st.slider('Years of prediction: ', 1 ,4)
 # getting the data for the selected symbol
 df = get_stock_data(selected_stock)
 
+st.subheader('Raw data')
+st.write(df.head())
+
+# candlestick
+st.write('Candlestick for {}'.format(selected_stock))
+fig = plot_candles(df, selected_stock)
+t.plotly_chart(fig)
+
 # apply model
-y_hat, m = prophet_forecast(df)
+y, m = prophet_forecast(data=df,
+                            n_years=n_years)
 
-
+# Forecast
+st.write('Forecast for {}'.format(selected_stock))
+fig = plot_forecast(y,
+                    period = 365*n_years)
+st.write(y)
 
